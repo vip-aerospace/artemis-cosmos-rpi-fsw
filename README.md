@@ -1,4 +1,4 @@
-# Artemis Flight software (Raspberry Pi)
+# Artemis Flight Software (Raspberry Pi)
 This repository contains the flight software for the Artemis Raspberry Pi computer.
 
 Clone Artemis-RPi-Flight-Software into:
