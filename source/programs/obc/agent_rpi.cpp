@@ -16,6 +16,17 @@
 
 using namespace Artemis::rpi::Channel;
 
+typedef void (*on_event_switch)(bool active);
+/**
+ * @brief Primitive triggering of an event based on flags
+ *
+ * @param flags Flag bools
+ * @param event_switch Event switch to flip if matching conditions differ
+ * @param event Stuff to run once when the event switch flips, bool argument for active/inactive case
+ */
+void fire_event(const vector<bool> flags, bool &event_switch, on_event_switch);
+void on_toteensy_on_event_switch(bool active);
+
 // For external linkage
 bool start_teensy = true;
 bool start_exec = true;
@@ -38,7 +49,7 @@ namespace
 
     // Flags, flipped on triggering conditions
     // Set these
-    bool toteensy_on_flag = false;
+    bool toteensy_on_flag = true;
     // Events, flipped on certain combinations of flags
     // Not directly set
     bool toteensy_on_event_switch = false;
@@ -93,6 +104,12 @@ int main(int argc, char *argv[])
     PacketComm packet;
     while (agent->running())
     {
+        // Check events
+        fire_event({toteensy_on_flag}, toteensy_on_event_switch, &on_toteensy_on_event_switch);
+
+        if (toteensy_on_event_switch)
+        {
+        }
 
         // Update rpi cpu telemetry
         if (tet.split() > 5.)
@@ -125,6 +142,12 @@ int main(int argc, char *argv[])
         // Comm - Internal
         if ((iretn = agent->channel_pull(mychannel, packet)) > 0)
         {
+            string response;
+            packethandler.process(packet, response);
+            if (packet.header.radio > 0)
+            {
+                // agent->push_response(packet.header.radio, mychannel, packet.header.orig, 0, response);
+            }
         }
 
         // Update saved time
@@ -169,8 +192,7 @@ int32_t init_agent_rpi()
 
     // Set channels
     agent->set_verification(0xf853);
-    agent->channel_add("TOTEENSY", Support::Channel::PACKETCOMM_DATA_SIZE, 18000.);
-    agent->channel_add("EXEC", Support::Channel::PACKETCOMM_DATA_SIZE, 18000.);
+    agent->channel_add("TOTEENSY", 42); // 50-8 50 is max size of radio, 8 is packet header size
 
     // Set time
     FILE *fp = fopen((get_cosmosnodes() + agent->nodeName + "/last_date").c_str(), "r");
@@ -306,4 +328,35 @@ static int32_t get_last_offset()
         fclose(fp);
     }
     return offset;
+}
+
+void on_toteensy_on_event_switch(bool active)
+{
+    if (!active)
+    {
+        PacketHandler::QueueTransferRadio(agent->channel_number("TOTEENSY"), false, agent, rpi_node_id);
+        return;
+    }
+    PacketHandler::QueueTransferRadio(agent->channel_number("TOTEENSY"), true, agent, rpi_node_id);
+    return;
+}
+
+void fire_event(const vector<bool> flags, bool &event_switch, void (*event)(bool))
+{
+    bool switch_active = true;
+    // All flags must be true for event switch to be active
+    for (const bool flag : flags)
+    {
+        if (!flag)
+        {
+            switch_active = false;
+            break;
+        }
+    }
+    // If switch was flipped, fire event
+    if (event_switch != switch_active)
+    {
+        event_switch = switch_active;
+        event(switch_active);
+    }
 }
