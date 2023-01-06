@@ -62,10 +62,8 @@ namespace Artemis
                         fflush(stdout);
                     }
                     // Set radios to use and in the order of the use priority, highest to lowest
-                    // uint8_t XBAND = agent->channel_number("XBAND");
-                    // uint8_t TXSI2C = agent->channel_number("TXSI2C");
-                    // uint8_t UHFDOWN = agent->channel_number("UHFDOWN");
-                    // file_module->set_radios({/*XBAND, */ TXSI2C, UHFDOWN});
+                    uint8_t TOTEENSY_CHANNELNUM = agent->channel_number("TOTEENSY");
+                    file_module->set_radios({TOTEENSY_CHANNELNUM});
                 }
 
                 if (start_teensy)
