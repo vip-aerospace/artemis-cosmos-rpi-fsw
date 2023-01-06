@@ -191,12 +191,6 @@ namespace Artemis
                 return offset;
             }
 
-            int32_t ExecChannel::take_picture()
-            {
-                printf("hi\n");
-                return 0;
-            }
-
         }
     }
 }
