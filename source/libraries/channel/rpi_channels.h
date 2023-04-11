@@ -21,7 +21,7 @@ namespace Artemis
             extern NodeData::NODE_ID_TYPE ground_node_id;
             static CRC16 calc_crc;
 
-            int32_t init_rpi_channels(Agent *agent, bool start_exec, bool start_file, bool start_teensy);
+            int32_t init_rpi_channels(Agent *agent, bool start_exec, bool start_file, bool start_teensy, bool start_payload);
 
             class ExecChannel
             {
@@ -66,8 +66,22 @@ namespace Artemis
 
             private:
                 I2C *i2c;
+                Serial *serial;
 
                 int32_t i2c_recv(PacketComm &packet);
+            };
+
+            class PayloadChannel
+            {
+            public:
+                PayloadChannel();
+                int32_t Init(Agent *agent);
+                void Loop();
+                int32_t mychannel;
+                uint16_t mydatasize = 0;
+                float mydataspeed = 0.;
+                bool running;
+                Agent *agent;
             };
 
             // Teensy stuff

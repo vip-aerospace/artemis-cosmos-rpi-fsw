@@ -12,12 +12,14 @@ namespace Artemis
 
             thread teensy_thread;
             TeensyChannel *teensy_channel;
+            thread payload_thread;
+            PayloadChannel *payload_channel;
             thread file_thread;
             Cosmos::Module::FileModule *file_module;
             thread exec_thread;
             ExecChannel *exec_channel;
 
-            int32_t init_rpi_channels(Agent *agent, bool start_exec, bool start_file, bool start_teensy)
+            int32_t init_rpi_channels(Agent *agent, bool start_exec, bool start_file, bool start_teensy, bool start_payload)
             {
                 int32_t iretn = 0;
 
@@ -81,6 +83,25 @@ namespace Artemis
                                                { teensy_channel->Loop(); });
                         secondsleep(3.);
                         printf("%f TEENSY: Thread started\n", agent->uptime.split());
+                        fflush(stdout);
+                    }
+                }
+
+                if (start_payload)
+                {
+                    payload_channel = new PayloadChannel();
+                    iretn = payload_channel->Init(agent);
+                    if (iretn < 0)
+                    {
+                        printf("%f Payload: Init Error - Not Starting Loop: %s\n", agent->uptime.split(), cosmos_error_string(iretn).c_str());
+                        fflush(stdout);
+                    }
+                    else
+                    {
+                        payload_thread = thread([=]
+                                                { payload_channel->Loop(); });
+                        secondsleep(3.);
+                        printf("%f Payload: Thread started\n", agent->uptime.split());
                         fflush(stdout);
                     }
                 }
