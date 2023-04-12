@@ -67,7 +67,17 @@ namespace Artemis
                             iretn = packet.RawUnPacketize();
                         if (iretn >= 0)
                         {
-                            agent->channel_push(0, packet);
+                            switch (packet.header.type)
+                            {
+                            case PacketComm::TypeId::CommandCameraCapture:
+                            case PacketComm::TypeId::CommandObcHalt:
+                                agent->channel_push("PAYLOAD", packet);
+                                break;
+
+                            default:
+                                agent->channel_push(0, packet);
+                                break;
+                            }
                         }
                     }
 

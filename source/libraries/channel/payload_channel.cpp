@@ -35,17 +35,24 @@ namespace Artemis
                 //                ElapsedTime et;
                 while (agent->running())
                 {
-
                     // Comm - Internal
                     if ((iretn = agent->channel_pull(mychannel, packet)) > 0)
-
                     {
+                        printf("%u\n", packet.header.type);
                         switch (packet.header.type)
                         {
-                        case (PacketComm::TypeId)200: // TODO: PacketComm::TypeId::CommandTakePicture
+                        case PacketComm::TypeId::CommandCameraCapture:
                         {
                             string response;
-                            iretn = data_execute("python3 ~/capture.py", response);
+                            iretn = data_execute("python3 ~/scripts/capture.py", response);
+                            printf("%s\n", response);
+                        }
+                        break;
+                        case PacketComm::TypeId::CommandObcHalt:
+                        {
+                            string response;
+                            iretn = data_execute("sudo shutdown now", response);
+                            printf("%s\n", response);
                         }
                         break;
                         }
