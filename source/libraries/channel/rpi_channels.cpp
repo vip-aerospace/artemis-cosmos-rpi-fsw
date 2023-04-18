@@ -16,35 +16,14 @@ namespace Artemis
             PayloadChannel *payload_channel;
             thread file_thread;
             Cosmos::Module::FileModule *file_module;
-            thread exec_thread;
-            ExecChannel *exec_channel;
 
-            int32_t init_rpi_channels(Agent *agent, bool start_exec, bool start_file, bool start_teensy, bool start_payload)
+            int32_t init_rpi_channels(Agent *agent, bool start_file, bool start_teensy, bool start_payload)
             {
                 int32_t iretn = 0;
 
                 teensy_node_id = agent->nodeData.lookup_node_id("teensy");
                 ground_node_id = agent->nodeData.lookup_node_id("ground");
                 rpi_node_id = agent->nodeData.lookup_node_id("rpi");
-
-                if (start_exec)
-                {
-                    exec_channel = new ExecChannel();
-                    iretn = exec_channel->Init(agent);
-                    if (iretn < 0)
-                    {
-                        printf("%f EXEC: Init Error - Not Starting Loop: %s\n", agent->uptime.split(), cosmos_error_string(iretn).c_str());
-                        fflush(stdout);
-                    }
-                    else
-                    {
-                        exec_thread = thread([=]
-                                             { exec_channel->Loop(); });
-                        secondsleep(3.);
-                        printf("%f EXEC: Thread started\n", agent->uptime.split());
-                        fflush(stdout);
-                    }
-                }
 
                 if (start_file)
                 {

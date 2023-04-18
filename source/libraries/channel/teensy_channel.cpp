@@ -49,7 +49,7 @@ namespace Artemis
 
                 agent->debug_log.Printf("Starting Teensy Loop\n");
 
-                //                ElapsedTime et;
+                // ElapsedTime et;
                 while (agent->running())
                 {
                     struct sysinfo meminfoin;

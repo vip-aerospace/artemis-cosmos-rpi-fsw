@@ -21,35 +21,7 @@ namespace Artemis
             extern NodeData::NODE_ID_TYPE ground_node_id;
             static CRC16 calc_crc;
 
-            int32_t init_rpi_channels(Agent *agent, bool start_exec, bool start_file, bool start_teensy, bool start_payload);
-
-            class ExecChannel
-            {
-            public:
-                ExecChannel();
-                int32_t Init(Agent *agent);
-                void Loop();
-                int32_t mychannel;
-                uint16_t mydatasize = 0;
-                bool running;
-                Agent *agent;
-                unordered_map<string, uint16_t> tsen_didx;
-
-                void move_and_compress_exec();
-                void move_and_compress_soh();
-                int32_t get_last_offset();
-
-            private:
-                vector<eventstruc> eventdict;
-                string immediate_dir;
-                CommandQueue cmd_queue;
-                vector<jsonentry *> logtable;
-                string logstring;
-                DataLog loghandle;
-
-                int32_t take_picture();
-            };
-
+            int32_t init_rpi_channels(Agent *agent, bool start_file, bool start_teensy, bool start_payload);
             class TeensyChannel
             {
             public:
@@ -91,10 +63,6 @@ namespace Artemis
             // File stuff
             extern thread file_thread;
             extern Cosmos::Module::FileModule *file_module;
-
-            // Exec stuff
-            extern thread exec_thread;
-            extern ExecChannel *exec_channel;
 
         }
     }

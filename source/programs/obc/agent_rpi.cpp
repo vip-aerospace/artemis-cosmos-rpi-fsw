@@ -72,17 +72,13 @@ int main(int argc, char *argv[])
     {
         // debug_level = static_cast<Error::LogType>(argv[1][0] - '0');
     }
-    if (argc == 5)
+    if (argc == 4)
     {
         if (argv[2][0] == '0')
         {
             start_teensy = false;
         }
         if (argv[3][0] == '0')
-        {
-            start_exec = false;
-        }
-        if (argv[4][0] == '0')
         {
             start_file = false;
         }
@@ -318,7 +314,7 @@ int32_t init_agent_rpi()
     // agent->set_sohstring(sohlist);
     json_updatecosmosstruc(agent->cinfo);
 
-    init_rpi_channels(agent, start_exec, start_file, start_teensy, start_payload);
+    init_rpi_channels(agent, start_file, start_teensy, start_payload);
 
     return 0;
 }
