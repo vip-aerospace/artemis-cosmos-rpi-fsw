@@ -10,8 +10,8 @@ build-source-Desktop_Qt_5_12_2_GCC_64bit-Default/
 source/CMakeLists\.txt\.user\.20
 source/CMakeLists\.txt\.user\.4\.8-pre1
 
-build/
-source/build/*
+/build
+/source/build/*
 .vscode/
 !source/build/do_*
 !source/build/build_all_*
