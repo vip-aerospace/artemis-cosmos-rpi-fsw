@@ -143,20 +143,6 @@ include_directories(${COSMOS_SOURCE}/core/libraries)
 
 # Note that the modules folder must be cloned/added in manually
 
-# include_directories(${COSMOS_SOURCE}/modules/devices/isis/libraries)
-# add_subdirectory(${COSMOS_SOURCE}/modules/devices/isis/libraries     ${CMAKE_BINARY_DIR}/libraries/isis)
-
-# include_directories(${COSMOS_SOURCE}/modules/devices/radio/astrodev/libraries)
-# add_subdirectory(${COSMOS_SOURCE}/modules/devices/radio/astrodev/libraries     ${CMAKE_BINARY_DIR}/libraries/astrodev)
-
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(LIBCAMERA REQUIRED libcamera)
-message(STATUS "libcamera library found:")
-message(STATUS "    version: ${LIBCAMERA_VERSION}")
-message(STATUS "    libraries: ${LIBCAMERA_LINK_LIBRARIES}")
-message(STATUS "    include path: ${LIBCAMERA_INCLUDE_DIRS}")
-include_directories(${CMAKE_SOURCE_DIR} ${LIBCAMERA_INCLUDE_DIRS})
-
 include_directories(${PROJECT_SOURCE_DIR}/libraries)
 add_subdirectory(${PROJECT_SOURCE_DIR}/libraries)
 

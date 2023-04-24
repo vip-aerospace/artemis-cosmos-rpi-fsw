@@ -14,8 +14,6 @@ namespace Artemis
             {
                 int32_t iretn = 0;
                 this->agent = agent;
-                i2c = new I2C("/dev/i2c-1", 0x08);
-                i2c->connect();
 
                 serial = new Serial("/dev/ttyS0", 9600);
 
@@ -64,9 +62,13 @@ namespace Artemis
                     {
                         packet.packetized.clear();
                         if ((iretn = serial->get_slip(packet.packetized)) > 0)
+                        {
                             iretn = packet.RawUnPacketize();
+                            printf("%d\n", iretn);
+                        }
                         if (iretn >= 0)
                         {
+                            printf("%d\n", packet.header.type);
                             switch (packet.header.type)
                             {
                             case PacketComm::TypeId::CommandCameraCapture:
