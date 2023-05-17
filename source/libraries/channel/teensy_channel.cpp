@@ -19,7 +19,7 @@ namespace Artemis
 
                 if ((iretn = serial->get_error()) < 0)
                 {
-                    printf("error opening serial\n");
+                    printf("Error with serial connection\n");
                     return -1;
                 }
 
@@ -53,6 +53,7 @@ namespace Artemis
                     struct sysinfo meminfoin;
                     sysinfo(&meminfoin);
 
+                    // I2C Communication with Teensy
                     // if (i2c_recv(packet) >= 0)
                     // {
                     //     iretn = agent->channel_push(0, packet);

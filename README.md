@@ -4,9 +4,7 @@ This repository contains the flight software for the Artemis Raspberry Pi comput
 Clone Artemis-RPi-Flight-Software into:
 `~/cosmos/source/projects/Artemis-RPi-Flight-Software`
 
-Current Functionality of the software:
-* Takes Photo
+For documentation and tutorials, visit our [project website](https://sites.google.com/hawaii.edu/artemiscubesatkit).
 
-TODO: 
-* File Transfer
-* ADCS
+Current Functionality of the software:
+* Receives CameraCapture command from Teensy, takes photograph, and stores it to the SD card. 
