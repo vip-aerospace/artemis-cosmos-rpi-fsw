@@ -65,7 +65,6 @@ namespace Artemis
                         if ((iretn = serial->get_slip(packet.packetized)) > 0)
                         {
                             iretn = packet.RawUnPacketize();
-                            printf("%d\n", iretn);
                         }
                         if (iretn >= 0)
                         {

@@ -44,7 +44,7 @@ namespace Artemis
                         case PacketComm::TypeId::CommandCameraCapture:
                         {
                             string response;
-                            iretn = data_execute("python3 ~/scripts/capture.py", response);
+                            iretn = data_execute("python3 ~/Artemis-Scripts/capture.py", response);
                             printf("%s\n", response);
                         }
                         break;
