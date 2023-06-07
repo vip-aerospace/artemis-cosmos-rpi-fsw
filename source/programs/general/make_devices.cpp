@@ -25,7 +25,6 @@ int main(int argc, char *argv[])
     iretn = json_createpiece(agent->cinfo, "rpi_disk", DeviceType::DISK);
 
     // teensy
-    iretn = json_createpiece(agent->cinfo, "teensy_cpu", DeviceType::CPU);
     iretn = json_createpiece(agent->cinfo, "teensy_disk", DeviceType::DISK);
 
     json_dump_node(agent->cinfo);

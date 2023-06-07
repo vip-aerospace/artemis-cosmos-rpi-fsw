@@ -11,5 +11,3 @@ foreach(direct ${directs})
     endif()
 endforeach()
 
-#add_subdirectory(${PROJECT_SOURCE_DIR}/programs/testbed)
-#add_subdirectory(${PROJECT_SOURCE_DIR}/programs/agents)

@@ -12,9 +12,22 @@ namespace Artemis
 
             int32_t TeensyChannel::Init(Agent *agent)
             {
+                int32_t iretn = 0;
                 this->agent = agent;
-                i2c = new I2C("/dev/i2c-1", 0x08);
-                i2c->connect();
+
+                serial = new Serial("/dev/ttyS0", 9600);
+
+                if ((iretn = serial->get_error()) < 0)
+                {
+                    printf("Error with serial connection\n");
+                    return -1;
+                }
+
+                serial->set_rtimeout(1.);
+                serial->set_wtimeout(1.);
+                serial->set_flowcontrol(0, 0);
+                serial->drain();
+
                 return 0;
             }
 
@@ -32,17 +45,42 @@ namespace Artemis
                     mydataspeed = agent->channel_speed(mychannel);
                 }
 
-                agent->debug_error.Printf("Starting Teensy Loop\n");
+                agent->debug_log.Printf("Starting Teensy Loop\n");
 
-                //                ElapsedTime et;
+                // ElapsedTime et;
                 while (agent->running())
                 {
                     struct sysinfo meminfoin;
                     sysinfo(&meminfoin);
 
-                    if (i2c_recv(packet) >= 0)
+                    // I2C Communication with Teensy
+                    // if (i2c_recv(packet) >= 0)
+                    // {
+                    //     iretn = agent->channel_push(0, packet);
+                    // }
+
+                    if (serial->get_open())
                     {
-                        iretn = agent->channel_push("EXEC", packet);
+                        packet.packetized.clear();
+                        if ((iretn = serial->get_slip(packet.packetized)) > 0)
+                        {
+                            iretn = packet.RawUnPacketize();
+                        }
+                        if (iretn >= 0)
+                        {
+                            printf("%d\n", packet.header.type);
+                            switch (packet.header.type)
+                            {
+                            case PacketComm::TypeId::CommandCameraCapture:
+                            case PacketComm::TypeId::CommandObcHalt:
+                                agent->channel_push("PAYLOAD", packet);
+                                break;
+
+                            default:
+                                agent->channel_push(0, packet);
+                                break;
+                            }
+                        }
                     }
 
                     // Comm - Internal
@@ -78,7 +116,7 @@ namespace Artemis
 
                 if (iretn < 0)
                     return -1;
-
+                // push to 0 channel
                 return 0;
             }
         }
