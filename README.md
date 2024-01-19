@@ -1,7 +1,7 @@
 <img src="images/artemis.png" alt="Artemis" width="190" height="180"> <img src="images/university-of-hawaii-manoa.png" alt="University of Hawaii Manoa" width="180" height="180"> <br>
 
 # Artemis Cubesat Kit Flight Software (Raspberry Pi Zero W)
-This repository contains the flight software for the Artemis Cubesat's Raspberry Pi Zero.
+This repository contains the HSFL COSMOS flight software for the Artemis Cubesat's Raspberry Pi Zero.
 
 Clone Artemis-RPi-Flight-Software into:
 `~/cosmos/source/projects`
