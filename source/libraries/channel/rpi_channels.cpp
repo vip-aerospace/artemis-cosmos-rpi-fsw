@@ -6,9 +6,9 @@ namespace Artemis
     {
         namespace Channel
         {
-            NodeData::NODE_ID_TYPE rpi_node_id;
-            NodeData::NODE_ID_TYPE teensy_node_id;
-            NodeData::NODE_ID_TYPE ground_node_id;
+            NODE_ID_TYPE rpi_node_id;
+            NODE_ID_TYPE teensy_node_id;
+            NODE_ID_TYPE ground_node_id;
 
             thread teensy_thread;
             TeensyChannel *teensy_channel;
@@ -21,9 +21,9 @@ namespace Artemis
             {
                 int32_t iretn = 0;
 
-                teensy_node_id = agent->nodeData.lookup_node_id("teensy");
-                ground_node_id = agent->nodeData.lookup_node_id("ground");
-                rpi_node_id = agent->nodeData.lookup_node_id("rpi");
+                teensy_node_id = lookup_node_id(agent->cinfo, "teensy");
+                ground_node_id = lookup_node_id(agent->cinfo, "ground");
+                rpi_node_id = lookup_node_id(agent->cinfo, "rpi");
 
                 // Start File Thread TODO: Uncomment when file thread is created
                 // if (start_file)

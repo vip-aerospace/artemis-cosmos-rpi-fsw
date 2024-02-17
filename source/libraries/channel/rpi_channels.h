@@ -16,9 +16,9 @@ namespace Artemis
     {
         namespace Channel
         {
-            extern NodeData::NODE_ID_TYPE rpi_node_id;
-            extern NodeData::NODE_ID_TYPE teensy_node_id;
-            extern NodeData::NODE_ID_TYPE ground_node_id;
+            extern NODE_ID_TYPE rpi_node_id;
+            extern NODE_ID_TYPE teensy_node_id;
+            extern NODE_ID_TYPE ground_node_id;
             static CRC16 calc_crc;
 
             int32_t init_rpi_channels(Agent *agent, bool start_file, bool start_teensy, bool start_payload);

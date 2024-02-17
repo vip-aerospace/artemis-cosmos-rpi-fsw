@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
 
     // Define agent requests
 
-    agent->cinfo->agent[0].aprd = 1.;
+    agent->cinfo->agent0.aprd = 1.;
     agent->start_active_loop();
 
     // Start performing the body of the agent
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
 int32_t init_agent_rpi()
 {
     int32_t iretn = 0;
-    agent = new Agent("rpi", "rpi", 0., 10000, false, 0, NetworkType::UDP, 2);
+    agent = new Agent("", "rpi", "rpi", 0., 10000, false, 0, NetworkType::UDP, 2);
     agent->set_debug_level(1);
     initialmjd = currentmjd();
 
@@ -196,7 +196,7 @@ int32_t init_agent_rpi()
     agent->channel_add("PAYLOAD");
 
     // Set time
-    FILE *fp = fopen((get_cosmosnodes() + agent->nodeName + "/last_date").c_str(), "r");
+    FILE *fp = fopen((get_cosmosnodes() + agent->cinfo->node.name + "/last_date").c_str(), "r");
     if (fp != nullptr)
     {
         calstruc date;
@@ -228,7 +228,7 @@ int32_t init_agent_rpi()
     }
 
     // Information for Mission Elapsed Time
-    string idate = get_cosmosnodes() + agent->nodeName + "/initial_date";
+    string idate = get_cosmosnodes() + agent->cinfo->node.name + "/initial_date";
     idate = "initial_date";
     fp = fopen(idate.c_str(), "r");
     calstruc date;
@@ -322,7 +322,7 @@ int32_t init_agent_rpi()
 static int32_t get_last_offset()
 {
     int32_t offset = 0;
-    FILE *fp = fopen((get_cosmosnodes() + agent->nodeName + "/last_offset").c_str(), "r");
+    FILE *fp = fopen((get_cosmosnodes() + agent->cinfo->node.name + "/last_offset").c_str(), "r");
     if (fp != nullptr)
     {
         fscanf(fp, "%d", &offset);
