@@ -9,11 +9,11 @@ int main(int argc, char *argv[])
     int32_t iretn = 0;
     if (argc == 3)
     {
-        agent = new Agent(argv[1], argv[2]);
+        agent = new Agent("", argv[1], argv[2]);
     }
     else if (argc == 2)
     {
-        agent = new Agent(argv[1]);
+        agent = new Agent("", argv[1]);
     }
     else
     {
