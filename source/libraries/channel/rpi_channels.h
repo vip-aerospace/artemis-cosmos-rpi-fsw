@@ -29,6 +29,14 @@ namespace Artemis
             extern NODE_ID_TYPE teensy_node_id;
             /** @brief The ID number of the ground station node. */
             extern NODE_ID_TYPE ground_node_id;
+            /** @brief The thread for the Teensy channel. */
+            extern thread teensy_thread;
+            /** @brief The thread for file access. */
+            extern thread file_thread;
+            /** @todo This appears to be redundant. */
+            // extern TeensyChannel *teensy_channel;
+            /** @todo This appears to be redundant. */
+            // extern Cosmos::Module::FileModule *file_module;
             /** @todo This appears to not be used. */
             static CRC16 calc_crc;
 
@@ -77,17 +85,6 @@ namespace Artemis
                 int32_t Init(Agent *agent);
                 void Loop();
             };
-
-            // Teensy stuff
-            extern thread teensy_thread;
-            /** @todo This appears to be redundant. */
-            // extern TeensyChannel *teensy_channel;
-
-            // File stuff
-            extern thread file_thread;
-            /** @todo This appears to be redundant. */
-            // extern Cosmos::Module::FileModule *file_module;
-
         }
     }
 }
