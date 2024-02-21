@@ -4,7 +4,7 @@ namespace Artemis
 {
     namespace RaspberryPi
     {
-        namespace Channel
+        namespace Channels
         {
             PayloadChannel::PayloadChannel()
             {

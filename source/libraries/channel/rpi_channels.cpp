@@ -4,7 +4,7 @@ namespace Artemis
 {
     namespace RaspberryPi
     {
-        namespace Channel
+        namespace Channels
         {
             NODE_ID_TYPE rpi_node_id;
             NODE_ID_TYPE teensy_node_id;

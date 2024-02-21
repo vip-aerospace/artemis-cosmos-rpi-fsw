@@ -20,7 +20,7 @@ namespace Artemis
     namespace RaspberryPi
     {
         /** @brief The Raspberry Pi channels. */
-        namespace Channel
+        namespace Channels
         {
             /** @brief The ID number of the Raspberry Pi node. */
             extern NODE_ID_TYPE rpi_node_id;
