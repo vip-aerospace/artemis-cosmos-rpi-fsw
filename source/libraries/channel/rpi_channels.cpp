@@ -1,3 +1,9 @@
+/**
+ * @file rpi_channels.cpp
+ * @brief Definitions of Raspberry Pi COSMOS channel.
+ * 
+ * Defines the variables and function of the Raspberry Pi COSMOS channel. 
+ */
 #include "rpi_channels.h"
 
 namespace Artemis
@@ -11,12 +17,31 @@ namespace Artemis
             NODE_ID_TYPE ground_node_id;
 
             thread teensy_thread;
-            TeensyChannel *teensy_channel;
             thread payload_thread;
-            PayloadChannel *payload_channel;
             thread file_thread;
+
             Cosmos::Module::FileModule *file_module;
 
+            TeensyChannel *teensy_channel;
+            PayloadChannel *payload_channel;
+
+            /**
+             * @brief A helper function to initialize the channels for the 
+             * Raspberry Pi agent.
+             * 
+             * @param agent Agent: The Raspberry Pi agent that will contain the 
+             * channels.
+             * @param start_file bool: Whether to start the file channel. 
+             * @param start_teensy bool: Whether to start the Teensy channel.
+             * @param start_payload bool: Whether to start the payload channel.
+             * @return int32_t Always returns zero.
+             * 
+             * @todo This always returns zero. It therefore either needs no 
+             * return type and should be void, or should halt and return an 
+             * error value.
+             * 
+             * @todo The file thread (and thus file channel) is never started.
+             */
             int32_t init_rpi_channels(Agent *agent, bool start_file, bool start_teensy, bool start_payload)
             {
                 int32_t iretn = 0;

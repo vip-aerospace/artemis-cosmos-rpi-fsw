@@ -1,8 +1,9 @@
 /**
  * @file rpi_channels.h
- * @brief Definitions of Raspberry Pi COSMOS channels.
+ * @brief Declarations of Raspberry Pi COSMOS channels.
  * 
- * Defines the channels running on the Raspberry Pi.
+ * Declares the channels running on the Raspberry Pi, and their methods and 
+ * members.
  */
 #ifndef RPI_CHANNELS_H
 #define RPI_CHANNELS_H
@@ -16,11 +17,13 @@
 #include "module/file_module.h"
 #include "device/i2c/i2c.h"
 
+/** @brief The Artemis spacecraft. */
 namespace Artemis
 {
+    /** @brief The Raspberry Pi COSMOS agent. */
     namespace RaspberryPi
     {
-        /** @brief The Raspberry Pi channels. */
+        /** @brief The channels on the Raspberry Pi COSMOS agent. */
         namespace Channels
         {
             /** @brief The ID number of the Raspberry Pi node. */
@@ -29,14 +32,22 @@ namespace Artemis
             extern NODE_ID_TYPE teensy_node_id;
             /** @brief The ID number of the ground station node. */
             extern NODE_ID_TYPE ground_node_id;
+
             /** @brief The thread for the Teensy channel. */
             extern thread teensy_thread;
+            /** @brief The thread for the payload channel. */
+            extern thread payload_thread;
             /** @brief The thread for file access. */
             extern thread file_thread;
+
+            /** @todo This appears to be redundant. */
+            // extern Cosmos::Module::FileModule *file_module;
+
             /** @todo This appears to be redundant. */
             // extern TeensyChannel *teensy_channel;
             /** @todo This appears to be redundant. */
-            // extern Cosmos::Module::FileModule *file_module;
+            // extern PayloadChannel *payload_channel;
+
             /** @todo This appears to not be used. */
             static CRC16 calc_crc;
 
