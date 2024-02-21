@@ -13,7 +13,7 @@ namespace Artemis
             int32_t TeensyChannel::Init(Agent *agent)
             {
                 int32_t iretn = 0;
-                this->agent = agent;
+                this->teensyAgent = agent;
 
                 serial = new Serial("/dev/ttyS0", 9600);
 
@@ -37,18 +37,18 @@ namespace Artemis
                 int32_t iretn = 0;
 
                 PacketComm packet;
-                mychannel = agent->channel_number("TOTEENSY");
-                mydatasize = 0;
-                if (mychannel >= 0)
+                teensyChannelNumber = teensyAgent->channel_number("TOTEENSY");
+                teensyChannelDataSize = 0;
+                if (teensyChannelNumber >= 0)
                 {
-                    mydatasize = agent->channel_datasize(mychannel);
-                    mydataspeed = agent->channel_speed(mychannel);
+                    teensyChannelDataSize = teensyAgent->channel_datasize(teensyChannelNumber);
+                    teensyChannelDataSpeed = teensyAgent->channel_speed(teensyChannelNumber);
                 }
 
-                agent->debug_log.Printf("Starting Teensy Loop\n");
+                teensyAgent->debug_log.Printf("Starting Teensy Loop\n");
 
                 // ElapsedTime et;
-                while (agent->running())
+                while (teensyAgent->running())
                 {
                     struct sysinfo meminfoin;
                     sysinfo(&meminfoin);
@@ -56,7 +56,7 @@ namespace Artemis
                     // I2C Communication with Teensy
                     // if (i2c_recv(packet) >= 0)
                     // {
-                    //     iretn = agent->channel_push(0, packet);
+                    //     iretn = teensyAgent->channel_push(0, packet);
                     // }
 
                     if (serial->get_open())
@@ -73,18 +73,18 @@ namespace Artemis
                             {
                             case PacketComm::TypeId::CommandCameraCapture:
                             case PacketComm::TypeId::CommandObcHalt:
-                                agent->channel_push("PAYLOAD", packet);
+                                teensyAgent->channel_push("PAYLOAD", packet);
                                 break;
 
                             default:
-                                agent->channel_push(0, packet);
+                                teensyAgent->channel_push(0, packet);
                                 break;
                             }
                         }
                     }
 
                     // Comm - Internal
-                    if ((iretn = agent->channel_pull(mychannel, packet)) > 0)
+                    if ((iretn = teensyAgent->channel_pull(teensyChannelNumber, packet)) > 0)
                     {
                     }
 
