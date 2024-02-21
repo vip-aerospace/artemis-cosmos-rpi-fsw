@@ -1,7 +1,8 @@
-/*! brief rpi communications Agent
+/**
+ * @file agent_rpi.cpp
+ * @brief The Raspberry Pi communications agent.
+ * @ingroup agents
  */
-
-//! \ingroup agents
 
 #include "support/configCosmos.h"
 #include "support/convertlib.h"
@@ -16,6 +17,13 @@
 
 using namespace Artemis::RaspberryPi::Channels;
 
+/**
+ * @brief Type definition for pointer to a function.
+ * 
+ * This typedef defines a type for a pointer to a function accepting a single
+ * boolean argument. It is used to pass a function as a parameter to another
+ * function.
+ */
 typedef void (*on_event_switch)(bool active);
 /**
  * @brief Primitive triggering of an event based on flags
