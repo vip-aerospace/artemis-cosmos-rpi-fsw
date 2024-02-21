@@ -25,16 +25,9 @@ using namespace Artemis::RaspberryPi::Channels;
  * function.
  */
 typedef void (*on_event_switch)(bool active);
-/**
- * @brief Primitive triggering of an event based on flags
- *
- * @param flags Flag bools
- * @param event_switch Event switch to flip if matching conditions differ
- * @param event Stuff to run once when the event switch flips, bool argument for active/inactive case
- */
+
 void fire_event(const vector<bool> flags, bool &event_switch, on_event_switch);
 void update_radio_availability_for_file_transfer(bool active);
-
 int32_t forward_to_payload_channel(PacketComm &packet, string &response, Agent *agent);
 
 // For external linkage
@@ -356,23 +349,44 @@ void update_radio_availability_for_file_transfer(bool availability)
     return;
 }
 
-void fire_event(const vector<bool> flags, bool &event_switch, void (*event)(bool))
+/**
+ * @brief Helper function to trigger another function based on boolean flag 
+ * state change
+ * 
+ * This function triggers another function if and only if the following 
+ * conditions are met:
+ * 
+ * - All the passed-in flags are true, AND the event switch is false
+ * OR
+ * - At least one of the passed-in flags is false, AND the event switch is true
+ * 
+ * If either condition is met, the event switch is toggled to the opposite value
+ * (false becomes true, or true becomes false), and it is passed as an argument 
+ * to the specified function. Note that if the event switch is not toggled, the
+ * event function is not triggered.
+ *
+ * @param flags vector<bool>: The flags to be checked against the event switch.
+ * @param event_switch bool: The initial state of the event switch. This switch
+ * could be changed by the time this function is done with it.
+ * @param eventHandler function(bool): The function to be called if the event 
+ * switch is toggled. The argument to the function is the post-toggle event 
+ * switch boolean.
+ */
+void fire_event(const vector<bool> flags, bool &event_switch, void (*eventHandler)(bool))
 {
-    bool switch_active = true;
-    // All flags must be true for event switch to be active
+    bool aggregateFlag = true;
     for (const bool flag : flags)
     {
         if (!flag)
         {
-            switch_active = false;
+            aggregateFlag = false;
             break;
         }
     }
-    // If switch was flipped, fire event
-    if (event_switch != switch_active)
+    if (event_switch != aggregateFlag)
     {
-        event_switch = switch_active;
-        event(switch_active);
+        event_switch = aggregateFlag;
+        eventHandler(event_switch);
     }
 }
 
