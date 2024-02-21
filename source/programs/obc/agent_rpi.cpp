@@ -33,7 +33,7 @@ typedef void (*on_event_switch)(bool active);
  * @param event Stuff to run once when the event switch flips, bool argument for active/inactive case
  */
 void fire_event(const vector<bool> flags, bool &event_switch, on_event_switch);
-void on_toteensy_on_event_switch(bool active);
+void update_radio_availability_for_file_transfer(bool active);
 
 int32_t PayloadForward(PacketComm &packet, string &response, Agent *agent);
 
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
     while (agent->running())
     {
         // Check events
-        // fire_event({toteensy_on_flag}, toteensy_on_event_switch, &on_toteensy_on_event_switch);
+        // fire_event({toteensy_on_flag}, toteensy_on_event_switch, &update_radio_availability_for_file_transfer);
 
         // if (toteensy_on_event_switch)
         // {
@@ -339,14 +339,20 @@ static int32_t get_last_offset()
     return offset;
 }
 
-void on_toteensy_on_event_switch(bool active)
+/**
+ * @brief Event-triggered function to indicate a change in radio availability 
+ * for file transfers.
+ * 
+ * This function is used to signal whether the radio is available for file 
+ * transfers. Importantly, it is only run when triggered by an event. The 
+ * triggering event for this function is whether the radio availability has 
+ * changed (either from true to false, or false to true).
+ * 
+ * @param availability bool: Whether the radio is available for file transfer.
+ */
+void update_radio_availability_for_file_transfer(bool availability)
 {
-    if (!active)
-    {
-        PacketHandler::QueueTransferRadio(agent->channel_number("TOTEENSY"), false, agent, rpi_node_id);
-        return;
-    }
-    PacketHandler::QueueTransferRadio(agent->channel_number("TOTEENSY"), true, agent, rpi_node_id);
+    PacketHandler::QueueTransferRadio(agent->channel_number("TOTEENSY"), availability, agent, rpi_node_id);
     return;
 }
 
