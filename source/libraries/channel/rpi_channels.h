@@ -2,6 +2,7 @@
  * @file rpi_channels.h
  * @brief Definitions of Raspberry Pi COSMOS channels.
  * 
+ * Defines the channels running on the Raspberry Pi.
  */
 #ifndef RPI_CHANNELS_H
 #define RPI_CHANNELS_H
@@ -79,7 +80,8 @@ namespace Artemis
 
             // Teensy stuff
             extern thread teensy_thread;
-            extern TeensyChannel *teensy_channel;
+            /** @todo This appears to be redundant. */
+            // extern TeensyChannel *teensy_channel;
 
             // File stuff
             extern thread file_thread;
