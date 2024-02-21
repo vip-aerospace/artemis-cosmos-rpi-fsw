@@ -85,7 +85,8 @@ namespace Artemis
 
             // File stuff
             extern thread file_thread;
-            extern Cosmos::Module::FileModule *file_module;
+            /** @todo This appears to be redundant. */
+            // extern Cosmos::Module::FileModule *file_module;
 
         }
     }
