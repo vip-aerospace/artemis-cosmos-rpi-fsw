@@ -14,7 +14,7 @@
 #include "device/disk/devicedisk.h"
 #include "channel/rpi_channels.h"
 
-using namespace Artemis::rpi::Channel;
+using namespace Artemis::RaspberryPi::Channel;
 
 typedef void (*on_event_switch)(bool active);
 /**

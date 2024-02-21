@@ -17,7 +17,7 @@
 
 namespace Artemis
 {
-    namespace rpi
+    namespace RaspberryPi
     {
         /** @brief The Raspberry Pi channels. */
         namespace Channel
