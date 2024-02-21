@@ -30,6 +30,9 @@ void fire_event(const vector<bool> flags, bool &event_switch, on_event_switch);
 void update_radio_availability_for_file_transfer(bool active);
 int32_t forward_to_payload_channel(PacketComm &packet, string &response, Agent *agent);
 
+int32_t init_agent_rpi();
+static int32_t get_last_offset();
+
 // For external linkage
 bool start_teensy = true;
 bool start_exec = true;
@@ -38,17 +41,25 @@ bool start_payload = true;
 
 namespace
 {
-    uint16_t cpu_didx;
-    uint16_t disk_didx;
-    // string sohstring;
+    /** @brief The Raspberry Pi COSMOS agent. */
     Agent *agent;
     double initialmjd;
-    // vector<string> sohlist;
-    DeviceCpu deviceCpu;
-    // static uint32_t verification = 0xf853;
-    DeviceDisk deviceDisk;
-    vector<DeviceDisk::info> dinfo;
 
+    /** @brief The Raspberry Pi CPU. */
+    DeviceCpu deviceCpu;
+    /** @brief The CPU's device index. */
+    uint16_t cpu_device_index;
+    /** @brief The Raspberry Pi storage. */
+    DeviceDisk deviceDisk;
+    /** @brief The storage device index. */
+    uint16_t disk_device_index;
+    /** @brief The storage device information struct. */
+    vector<DeviceDisk::info> disk_information;
+
+    /** @todo Unused variables */
+    // string sohstring;
+    // vector<string> sohlist;
+    // static uint32_t verification = 0xf853;
     // Error::LogType debug_level = Error::LOG_NONE;
 
     // Flags, flipped on triggering conditions
@@ -59,10 +70,19 @@ namespace
     bool toteensy_on_event_switch = false;
 }
 
-// Misc utility stuff
-int32_t init_agent_rpi();
-static int32_t get_last_offset();
-
+/**
+ * @brief The main agent function.
+ * 
+ * @param argc int: The number of arguments to the Raspberry Pi agent.
+ * @param argv char[]: The values of the arguments passed in to the Raspberry Pi
+ * agent.
+ * @return int Always returns zero.
+ * 
+ * @todo The return value is always zero. The type of this function *might* have
+ * to remain an int regardless.
+ * 
+ * @todo Break up into helper functions.
+ */
 int main(int argc, char *argv[])
 {
     int32_t iretn = 0;
@@ -85,6 +105,10 @@ int main(int argc, char *argv[])
         }
     }
 
+    /**
+     * Note that init_agent_rpi() always returns zero. It does not return 
+     * anything if it fails, as the program is terminated right then and there.
+     */
     iretn = init_agent_rpi();
 
     // Initialize packet handler
@@ -117,23 +141,23 @@ int main(int argc, char *argv[])
         // {
         //     agent->cinfo->node.utc = currentmjd();
         //     agent->cinfo->node.deci = decisec(agent->cinfo->node.utc);
-        //     agent->cinfo->devspec.cpu[cpu_didx].utc = currentmjd();
-        //     agent->cinfo->devspec.cpu[cpu_didx].uptime = deviceCpu.getUptime();
-        //     agent->cinfo->devspec.cpu[cpu_didx].load = static_cast<float>(deviceCpu.getLoad());
-        //     agent->cinfo->devspec.cpu[cpu_didx].gib = static_cast<float>(deviceCpu.getVirtualMemoryUsed() / 1073741824.);
-        //     dinfo = deviceDisk.getInfo();
-        //     for (uint16_t i = 0; i < dinfo.size(); ++i)
+        //     agent->cinfo->devspec.cpu[cpu_device_index].utc = currentmjd();
+        //     agent->cinfo->devspec.cpu[cpu_device_index].uptime = deviceCpu.getUptime();
+        //     agent->cinfo->devspec.cpu[cpu_device_index].load = static_cast<float>(deviceCpu.getLoad());
+        //     agent->cinfo->devspec.cpu[cpu_device_index].gib = static_cast<float>(deviceCpu.getVirtualMemoryUsed() / 1073741824.);
+        //     disk_information = deviceDisk.getInfo();
+        //     for (uint16_t i = 0; i < disk_information.size(); ++i)
         //     {
-        //         printf("Disk %u: mount=%s size=%lu used=%lu\n", i, dinfo[i].mount.c_str(), dinfo[i].size, dinfo[i].used);
-        //         if (dinfo[i].mount == "/")
+        //         printf("Disk %u: mount=%s size=%lu used=%lu\n", i, disk_information[i].mount.c_str(), disk_information[i].size, disk_information[i].used);
+        //         if (disk_information[i].mount == "/")
         //         {
-        //             if (dinfo[i].size)
+        //             if (disk_information[i].size)
         //             {
-        //                 agent->cinfo->devspec.cpu[cpu_didx].storage = dinfo[i].used / static_cast<float>(dinfo[i].size);
+        //                 agent->cinfo->devspec.cpu[cpu_device_index].storage = disk_information[i].used / static_cast<float>(disk_information[i].size);
         //             }
         //             else
         //             {
-        //                 agent->cinfo->devspec.cpu[cpu_didx].storage = 0.;
+        //                 agent->cinfo->devspec.cpu[cpu_device_index].storage = 0.;
         //             }
         //         }
         //     }
@@ -170,7 +194,7 @@ int main(int argc, char *argv[])
 
     agent->shutdown();
 
-    // Join all running threads
+    // Wait for all other running threads to finish.
     teensy_thread.join();
     file_thread.join();
 
@@ -184,6 +208,21 @@ int main(int argc, char *argv[])
 /////////////////////////
 // Utility functions
 /////////////////////////
+
+/**
+ * @brief Helper function to initialize the Raspberry Pi COSMOS agent.
+ * 
+ * @return int32_t Returns zero on successful initialization. Exits the program
+ * with an error code if initialization fails.
+ * 
+ * @todo Note that the function only returns a value if it succeeds. If some
+ * step fails in the initialization, the entire program terminates here, and 
+ * nothing is returned. Consider changing the type of this helper function to
+ * void.
+ * 
+ * @todo Consider breaking up this function into smaller, easier to understand,
+ * functions.
+ */
 int32_t init_agent_rpi()
 {
     int32_t iretn = 0;
@@ -275,16 +314,16 @@ int32_t init_agent_rpi()
     //     agent->shutdown();
     //     exit(iretn);
     // }
-    // cpu_didx = agent->cinfo->device[agent->cinfo->pieces[static_cast<uint16_t>(iretn)].cidx]->didx;
+    // cpu_device_index = agent->cinfo->device[agent->cinfo->pieces[static_cast<uint16_t>(iretn)].cidx]->didx;
 
-    // agent->cinfo->devspec.cpu[cpu_didx].utc = currentmjd();
-    // agent->cinfo->devspec.cpu[cpu_didx].uptime = deviceCpu.getUptime();
-    // agent->cinfo->devspec.cpu[cpu_didx].boot_count = deviceCpu.getBootCount();
-    // agent->cinfo->devspec.cpu[cpu_didx].load = static_cast<float>(deviceCpu.getLoad());
-    // agent->cinfo->devspec.cpu[cpu_didx].gib = static_cast<float>(deviceCpu.getVirtualMemoryUsed() / 1073741824.);
-    // agent->cinfo->devspec.cpu[cpu_didx].maxgib = static_cast<float>(deviceCpu.getVirtualMemoryTotal() / 1073741824.);
-    // agent->cinfo->devspec.cpu[cpu_didx].maxload = deviceCpu.getCpuCount();
-    // deviceCpu.numProcessors = agent->cinfo->devspec.cpu[cpu_didx].maxload;
+    // agent->cinfo->devspec.cpu[cpu_device_index].utc = currentmjd();
+    // agent->cinfo->devspec.cpu[cpu_device_index].uptime = deviceCpu.getUptime();
+    // agent->cinfo->devspec.cpu[cpu_device_index].boot_count = deviceCpu.getBootCount();
+    // agent->cinfo->devspec.cpu[cpu_device_index].load = static_cast<float>(deviceCpu.getLoad());
+    // agent->cinfo->devspec.cpu[cpu_device_index].gib = static_cast<float>(deviceCpu.getVirtualMemoryUsed() / 1073741824.);
+    // agent->cinfo->devspec.cpu[cpu_device_index].maxgib = static_cast<float>(deviceCpu.getVirtualMemoryTotal() / 1073741824.);
+    // agent->cinfo->devspec.cpu[cpu_device_index].maxload = deviceCpu.getCpuCount();
+    // deviceCpu.numProcessors = agent->cinfo->devspec.cpu[cpu_device_index].maxload;
 
     // iretn = json_findpiece(agent->cinfo, "rpi_disk");
     // if (iretn < 0)
@@ -293,22 +332,22 @@ int32_t init_agent_rpi()
     //     agent->shutdown();
     //     exit(iretn);
     // }
-    // disk_didx = agent->cinfo->device[agent->cinfo->pieces[static_cast<uint16_t>(iretn)].cidx]->didx;
+    // disk_device_index = agent->cinfo->device[agent->cinfo->pieces[static_cast<uint16_t>(iretn)].cidx]->didx;
 
-    // dinfo = deviceDisk.getInfo();
-    // for (uint16_t i = 0; i < dinfo.size(); ++i)
+    // disk_information = deviceDisk.getInfo();
+    // for (uint16_t i = 0; i < disk_information.size(); ++i)
     // {
-    //     if (dinfo[i].mount == "/")
+    //     if (disk_information[i].mount == "/")
     //     {
-    //         if (dinfo[i].size)
+    //         if (disk_information[i].size)
     //         {
-    //             agent->cinfo->devspec.cpu[cpu_didx].storage = dinfo[i].used / static_cast<float>(dinfo[i].size);
+    //             agent->cinfo->devspec.cpu[cpu_device_index].storage = disk_information[i].used / static_cast<float>(disk_information[i].size);
     //         }
     //         else
     //         {
-    //             agent->cinfo->devspec.cpu[cpu_didx].storage = 0.;
+    //             agent->cinfo->devspec.cpu[cpu_device_index].storage = 0.;
     //         }
-    //         agent->cinfo->devspec.disk[disk_didx].path = dinfo[i].mount.c_str();
+    //         agent->cinfo->devspec.disk[disk_device_index].path = disk_information[i].mount.c_str();
     //     }
     // }
 
