@@ -35,7 +35,7 @@ typedef void (*on_event_switch)(bool active);
 void fire_event(const vector<bool> flags, bool &event_switch, on_event_switch);
 void update_radio_availability_for_file_transfer(bool active);
 
-int32_t PayloadForward(PacketComm &packet, string &response, Agent *agent);
+int32_t forward_to_payload_channel(PacketComm &packet, string &response, Agent *agent);
 
 // For external linkage
 bool start_teensy = true;
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
     // Initialize packet handler
     PacketHandler packethandler;
     packethandler.init(agent);
-    packethandler.add_func((PacketComm::TypeId)200, PayloadForward);
+    packethandler.add_func((PacketComm::TypeId)200, forward_to_payload_channel);
 
     // Define agent requests
 
@@ -376,9 +376,20 @@ void fire_event(const vector<bool> flags, bool &event_switch, void (*event)(bool
     }
 }
 
-int32_t PayloadForward(PacketComm &packet, string &response, Agent *agent)
+/**
+ * @brief Function to forward a packet to the payload channel.
+ * 
+ * This function is added as an externally-defined function of the PacketHandler
+ * object. It gives the PacketHandler the ability to route packets to the 
+ * payload channel.
+ * 
+ * @param packet PacketComm: The packet to be forwarded.
+ * @param response string: The response from the packet handler.
+ * @param agent Agent: The packet handler agent, which does the forwarding.
+ * @return int32_t Size of packet in bytes if successfully forwarded, negative 
+ * error value if unsuccessful.
+ */
+int32_t forward_to_payload_channel(PacketComm &packet, string &response, Agent *agent)
 {
-    int32_t iretn = 0;
-    iretn = agent->channel_push(agent->channel_number("PAYLOAD"), packet);
-    return iretn;
+    return agent->channel_push(agent->channel_number("PAYLOAD"), packet);
 }
