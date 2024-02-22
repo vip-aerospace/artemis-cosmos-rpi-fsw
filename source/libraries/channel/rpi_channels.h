@@ -77,8 +77,15 @@ namespace Artemis
                 I2C *i2c;
                 /** @brief The UART serial connection to the Teensy. */
                 Serial *serial;  
+                /** @brief A packet being received from the Teensy. */
+                PacketComm incomingPacket;
+                /** @brief A packet to be sent to the Teensy. */
+                PacketComm outgoingPacket;
 
-                int32_t i2c_recv(PacketComm &packet);
+                void receiveFromTeensySerial();
+                void sendToTeensySerial();
+                void receiveFromTeensyI2C();
+                void sendToTeensyI2C();
             };
 
             /** @brief The payload COSMOS channel class. */

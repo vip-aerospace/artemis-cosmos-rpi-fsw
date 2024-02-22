@@ -12,9 +12,8 @@ namespace Artemis
     {
         namespace Channels
         {
-            TeensyChannel::TeensyChannel()
-            {
-            }
+            /** @brief Construct a new Teensy Channel:: Teensy Channel object */
+            TeensyChannel::TeensyChannel() {}
 
             /**
              * @brief Teensy channel initialization method.
@@ -36,7 +35,7 @@ namespace Artemis
                 int32_t iretn = serial->get_error();
                 if (iretn < 0)
                 {
-                    printf("Error setting up Teensy UART serial connection. iretn=%d\n", iretn);
+                    teensyAgent->debug_log.Printf("Error setting up Teensy UART serial connection. iretn=%d\n", iretn);
                     return iretn;
                 }
 
@@ -49,7 +48,7 @@ namespace Artemis
                 if (teensyChannelNumber < 0)
                 {
                     iretn = teensyChannelNumber;
-                    printf("Error setting up Teensy channel number. iretn=%d\n", iretn);
+                    teensyAgent->debug_log.Printf("Error setting up Teensy channel number. iretn=%d\n", iretn);
                     return iretn;
                 }
 
@@ -59,13 +58,19 @@ namespace Artemis
                 return 0;
             }
 
-            // Communicates with Teensy via PacketComm packets
+            /**
+             * @brief Teensy channel worker method.
+             * 
+             * This method describes the Teensy channel functionality. Like an
+             * Arduino script, this method runs in an infinite loop. This method
+             * runs in its own thread.
+             * 
+             * @todo This includes communication with the Teensy over I2C. Check
+             * that I2C will ever be used for this purpose. If not, remove this
+             * code.
+             */
             void TeensyChannel::Loop()
             {
-                int32_t iretn = 0;
-
-                PacketComm packet;
-
                 teensyAgent->debug_log.Printf("Starting Teensy Loop\n");
 
                 // ElapsedTime et;
@@ -74,40 +79,11 @@ namespace Artemis
                     struct sysinfo meminfoin;
                     sysinfo(&meminfoin);
 
-                    // I2C Communication with Teensy
-                    // if (i2c_recv(packet) >= 0)
-                    // {
-                    //     iretn = teensyAgent->channel_push(0, packet);
-                    // }
+                    receiveFromTeensySerial();
+                    sendToTeensySerial();
 
-                    if (serial->get_open())
-                    {
-                        packet.packetized.clear();
-                        if ((iretn = serial->get_slip(packet.packetized)) > 0)
-                        {
-                            iretn = packet.RawUnPacketize();
-                        }
-                        if (iretn >= 0)
-                        {
-                            printf("%d\n", packet.header.type);
-                            switch (packet.header.type)
-                            {
-                            case PacketComm::TypeId::CommandCameraCapture:
-                            case PacketComm::TypeId::CommandObcHalt:
-                                teensyAgent->channel_push("PAYLOAD", packet);
-                                break;
-
-                            default:
-                                teensyAgent->channel_push(0, packet);
-                                break;
-                            }
-                        }
-                    }
-
-                    // Comm - Internal
-                    if ((iretn = teensyAgent->channel_pull(teensyChannelNumber, packet)) > 0)
-                    {
-                    }
+                    // receiveFromTeensyI2C();
+                    // sendToTeensyI2C();                  
 
                     std::this_thread::yield();
                 }
@@ -115,31 +91,133 @@ namespace Artemis
                 return;
             }
 
-            int32_t TeensyChannel::i2c_recv(PacketComm &packet)
+            /**
+             * @brief Helper function to receive a packet from the Teensy over 
+             * UART serial.
+             */
+            void TeensyChannel::receiveFromTeensySerial() 
             {
-                int32_t iretn = 0;
+                int32_t iretn;
+
+                if (serial->get_open())
+                {
+                    incomingPacket.packetized.clear();
+                    
+                    if((iretn = serial->get_slip(incomingPacket.packetized)) <= 0)
+                    {
+                        if(iretn < 0)
+                        {
+                            teensyAgent->debug_log.Printf("Error in getting incoming SLIP packet. iretn=%d\n", iretn);
+                        }
+                        return;
+                    }
+
+                    if((iretn = incomingPacket.RawUnPacketize()) < 0)
+                    {
+                        teensyAgent->debug_log.Printf("Failed to un-packetize incoming UART serial packet. iretn=%d\n", iretn);
+                        return;
+                    }
+                    
+                    teensyAgent->debug_log.Printf("incomingPacket.header.type=%d\n", incomingPacket.header.type);
+                    
+                    switch (incomingPacket.header.type)
+                    {
+                        case PacketComm::TypeId::CommandCameraCapture:
+                        case PacketComm::TypeId::CommandObcHalt:
+                            iretn = teensyAgent->channel_push("PAYLOAD", incomingPacket);
+                            if(iretn < 0)
+                            {
+                                teensyAgent->debug_log.Printf("Failed to forward incoming packet to payload channel. iretn=%d\n", iretn);
+                                return;
+                            }
+                            break;
+                        default:
+                            iretn = teensyAgent->channel_push(0, incomingPacket);
+                            if(iretn < 0)
+                            {
+                                teensyAgent->debug_log.Printf("Failed to forward incoming packet to main channel. iretn=%d\n", iretn);
+                                return;
+                            }
+                            break;
+                    }
+                }
+
+                return;
+            }
+
+            /**
+             * @brief Helper function to send a packet to the Teensy over UART
+             * serial.
+             * 
+             * @todo Complete this function.
+             */
+            void TeensyChannel::sendToTeensySerial()
+            {
+                int32_t iretn = teensyAgent->channel_pull(teensyChannelNumber, outgoingPacket);
+                
+                if (iretn < 0)
+                {
+                    teensyAgent->debug_log.Printf("Error in checking Teensy channel for outgoing packet. iretn=%d\n", iretn);
+                    return;
+                }
+
+                return;
+            }
+
+            /**
+             * @brief Helper function to receive a packet from the Teensy over 
+             * I2C.
+             * 
+             * @todo If I2C will be used, complete this function. If it is not 
+             * to be used, delete this function.
+             */
+            void TeensyChannel::receiveFromTeensyI2C()
+            {
                 std::string msg;
 
-                // I2C From Teensy
-                iretn = i2c->receive(msg, 50);
-
+                int32_t iretn = i2c->receive(msg, 50);
                 if (iretn <= 0 || msg.length() < sizeof(PacketComm::header) + sizeof(PacketComm::crc))
-                    return -1;
+                {
+                    if (iretn < 0)
+                    {
+                        teensyAgent->debug_log.Printf("Failed to receive incoming I2C packet. iretn=%d\n", iretn);
+                    }
+                    else if (msg.length() < sizeof(PacketComm::header) + sizeof(PacketComm::crc))
+                    {
+                        teensyAgent->debug_log.Printf("Received incomplete incoming I2C packet. msg.length()=%d\n", msg.length());
+                    }
+                    return;
+                }
 
-                packet.wrapped.resize(0);
+                incomingPacket.wrapped.resize(0);
                 uint8_t data_len = msg[0];
                 for (size_t i = 0; i < sizeof(PacketComm::header) + data_len + sizeof(PacketComm::crc); i++)
                 {
-                    packet.wrapped.push_back(msg[i]);
+                    incomingPacket.wrapped.push_back(msg[i]);
                 }
 
-                iretn = packet.Unwrap();
+                if ((iretn = incomingPacket.Unwrap()) < 0)
+                {
+                    teensyAgent->debug_log.Printf("Failed to unwrap incoming I2C packet. iretn=%d\n", iretn);
+                    return;
+                }
 
-                if (iretn < 0)
-                    return -1;
-                // push to 0 channel
-                return 0;
+                if((iretn = teensyAgent->channel_push(0, incomingPacket)) < 0)
+                {
+                    teensyAgent->debug_log.Printf("Failed to forward incoming packet to main channel. iretn=%d\n", iretn);
+                    return;
+                }
+
+                return;
             }
+
+            /**
+             * @brief Helper function to send a packet to the Teensy over I2C.
+             * 
+             * @todo If I2C will be used, complete this function. If it is not 
+             * to be used, delete this function.
+             */
+            void TeensyChannel::sendToTeensyI2C() {}
         }
     }
 }
