@@ -1,3 +1,9 @@
+/**
+ * @file teensy_channel.cpp
+ * @brief Definitions of the Teensy channel.
+ * 
+ * Defines the methods of the Teensy channel.
+ */
 #include "rpi_channels.h"
 
 namespace Artemis
@@ -10,17 +16,27 @@ namespace Artemis
             {
             }
 
+            /**
+             * @brief Teensy channel initialization method.
+             * 
+             * This method "links" the Teensy channel to its controlling Agent,
+             * and initializes and configures the UART serial connection to the 
+             * Teensy.
+             * 
+             * @param agent Agent: The agent that will contain this channel.
+             * @return int32_t 0 on successful initialization, negative value if
+             * unsuccessful.
+             */
             int32_t TeensyChannel::Init(Agent *agent)
             {
-                int32_t iretn = 0;
                 this->teensyAgent = agent;
 
                 serial = new Serial("/dev/ttyS0", 9600);
 
-                if ((iretn = serial->get_error()) < 0)
+                if ((int32_t iretn = serial->get_error()) < 0)
                 {
                     printf("Error with serial connection\n");
-                    return -1;
+                    return iretn;
                 }
 
                 serial->set_rtimeout(1.);
