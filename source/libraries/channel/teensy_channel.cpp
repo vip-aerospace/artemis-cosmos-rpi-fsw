@@ -19,9 +19,9 @@ namespace Artemis
             /**
              * @brief Teensy channel initialization method.
              * 
-             * This method "links" the Teensy channel to its controlling Agent,
-             * and initializes and configures the UART serial connection to the 
-             * Teensy.
+             * This method describes the Teensy channel initialization. Like an 
+             * Arduino script, this method runs once, when the channel is first 
+             * being set up.
              * 
              * @param agent Agent: The agent that will contain this channel.
              * @return int32_t 0 on successful initialization, negative value if
@@ -33,9 +33,10 @@ namespace Artemis
 
                 serial = new Serial("/dev/ttyS0", 9600);
 
-                if ((int32_t iretn = serial->get_error()) < 0)
+                int32_t iretn = serial->get_error();
+                if (iretn < 0)
                 {
-                    printf("Error with serial connection\n");
+                    printf("Error setting up Teensy UART serial connection. iretn=%d\n", iretn);
                     return iretn;
                 }
 
@@ -43,6 +44,17 @@ namespace Artemis
                 serial->set_wtimeout(1.);
                 serial->set_flowcontrol(0, 0);
                 serial->drain();
+
+                teensyChannelNumber = teensyAgent->channel_number("TOTEENSY");
+                if (teensyChannelNumber < 0)
+                {
+                    iretn = teensyChannelNumber;
+                    printf("Error setting up Teensy channel number. iretn=%d\n", iretn);
+                    return iretn;
+                }
+
+                teensyChannelDataSize = teensyAgent->channel_datasize(teensyChannelNumber);
+                teensyChannelDataSpeed = teensyAgent->channel_speed(teensyChannelNumber);
 
                 return 0;
             }
@@ -53,13 +65,6 @@ namespace Artemis
                 int32_t iretn = 0;
 
                 PacketComm packet;
-                teensyChannelNumber = teensyAgent->channel_number("TOTEENSY");
-                teensyChannelDataSize = 0;
-                if (teensyChannelNumber >= 0)
-                {
-                    teensyChannelDataSize = teensyAgent->channel_datasize(teensyChannelNumber);
-                    teensyChannelDataSpeed = teensyAgent->channel_speed(teensyChannelNumber);
-                }
 
                 teensyAgent->debug_log.Printf("Starting Teensy Loop\n");
 
