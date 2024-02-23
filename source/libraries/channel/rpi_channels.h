@@ -102,6 +102,12 @@ namespace Artemis
                 PayloadChannel();
                 int32_t Init(Agent *agent);
                 void Loop();
+            
+            private:
+                /** @brief A packet containing a command for the payload. */
+                PacketComm incomingPacket;
+
+                void controlPayload();
             };
         }
     }

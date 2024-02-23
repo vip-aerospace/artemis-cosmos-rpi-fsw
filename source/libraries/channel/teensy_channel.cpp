@@ -25,6 +25,8 @@ namespace Artemis
              * @param agent Agent: The agent that will contain this channel.
              * @return int32_t 0 on successful initialization, negative value if
              * unsuccessful.
+             * 
+             * @todo Validate that the argument is valid.
              */
             int32_t TeensyChannel::Init(Agent *agent)
             {
