@@ -87,6 +87,10 @@ int main(int argc, char *argv[])
 {
     int32_t iretn = 0;
 
+    /////////////////////////////////////////////////////
+    // Setup
+    /////////////////////////////////////////////////////
+    // Argument validation
     // Optional arg
     // agent_rpi [debug_level]
     if (argc > 1 && (argv[1][0] >= '0' && argv[1][0] <= '4'))
@@ -105,6 +109,7 @@ int main(int argc, char *argv[])
         }
     }
 
+    // Agent initialization
     /**
      * Note that init_agent_rpi() always returns zero. It does not return 
      * anything if it fails, as the program is terminated right then and there.
@@ -117,11 +122,12 @@ int main(int argc, char *argv[])
     packethandler.add_func((PacketComm::TypeId)200, forward_to_payload_channel);
 
     // Define agent requests
-
     agent->cinfo->agent0.aprd = 1.;
     agent->start_active_loop();
 
-    // Start performing the body of the agent
+    ////////////////////////////////////////////////////
+    // Main Loop
+    ////////////////////////////////////////////////////
     agent->debug_log.Printf("Start main Agent loop\n");
     ElapsedTime savet;
     int32_t mychannel = 0;
@@ -192,8 +198,10 @@ int main(int argc, char *argv[])
         std::this_thread::yield();
     }
 
+    ////////////////////////////////////////////////
+    // Shutdown
+    ////////////////////////////////////////////////
     agent->shutdown();
-
     // Wait for all other running threads to finish.
     teensy_thread.join();
     file_thread.join();
