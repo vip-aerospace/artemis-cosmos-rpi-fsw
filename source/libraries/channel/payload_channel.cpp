@@ -12,7 +12,7 @@ namespace Artemis
 
             int32_t PayloadChannel::Init(Agent *agent)
             {
-                this->payloadAgent = agent;
+                this->channelAgent = agent;
                 return 0;
             }
 
@@ -22,21 +22,21 @@ namespace Artemis
                 int32_t iretn = 0;
 
                 PacketComm packet;
-                payloadChannelNumber = payloadAgent->channel_number("PAYLOAD");
-                payloadChannelDataSize = 0;
-                if (payloadChannelNumber >= 0)
+                channelNumber = channelAgent->channel_number("PAYLOAD");
+                channelDataSize = 0;
+                if (channelNumber >= 0)
                 {
-                    payloadChannelDataSize = payloadAgent->channel_datasize(payloadChannelNumber);
-                    payloadChannelDataSpeed = payloadAgent->channel_speed(payloadChannelNumber);
+                    channelDataSize = channelAgent->channel_datasize(channelNumber);
+                    channelDataSpeed = channelAgent->channel_speed(channelNumber);
                 }
 
-                payloadAgent->debug_log.Printf("Starting Payload Loop\n");
+                channelAgent->debug_log.Printf("Starting Payload Loop\n");
 
                 //                ElapsedTime et;
-                while (payloadAgent->running())
+                while (channelAgent->running())
                 {
                     // Comm - Internal
-                    if ((iretn = payloadAgent->channel_pull(payloadChannelNumber, packet)) > 0)
+                    if ((iretn = channelAgent->channel_pull(channelNumber, packet)) > 0)
                     {
                         printf("%u\n", packet.header.type);
                         switch (packet.header.type)

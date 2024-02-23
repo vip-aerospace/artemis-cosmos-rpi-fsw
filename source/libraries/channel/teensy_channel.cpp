@@ -28,14 +28,14 @@ namespace Artemis
              */
             int32_t TeensyChannel::Init(Agent *agent)
             {
-                this->teensyAgent = agent;
+                this->channelAgent = agent;
 
                 serial = new Serial("/dev/ttyS0", 9600);
 
                 int32_t iretn = serial->get_error();
                 if (iretn < 0)
                 {
-                    teensyAgent->debug_log.Printf("Error setting up Teensy UART serial connection. iretn=%d\n", iretn);
+                    channelAgent->debug_log.Printf("Error setting up Teensy UART serial connection. iretn=%d\n", iretn);
                     return iretn;
                 }
 
@@ -44,16 +44,16 @@ namespace Artemis
                 serial->set_flowcontrol(0, 0);
                 serial->drain();
 
-                teensyChannelNumber = teensyAgent->channel_number("TOTEENSY");
-                if (teensyChannelNumber < 0)
+                channelNumber = channelAgent->channel_number("TOTEENSY");
+                if (channelNumber < 0)
                 {
-                    iretn = teensyChannelNumber;
-                    teensyAgent->debug_log.Printf("Error setting up Teensy channel number. iretn=%d\n", iretn);
+                    iretn = channelNumber;
+                    channelAgent->debug_log.Printf("Error setting up Teensy channel number. iretn=%d\n", iretn);
                     return iretn;
                 }
 
-                teensyChannelDataSize = teensyAgent->channel_datasize(teensyChannelNumber);
-                teensyChannelDataSpeed = teensyAgent->channel_speed(teensyChannelNumber);
+                channelDataSize = channelAgent->channel_datasize(channelNumber);
+                channelDataSpeed = channelAgent->channel_speed(channelNumber);
 
                 return 0;
             }
@@ -71,10 +71,10 @@ namespace Artemis
              */
             void TeensyChannel::Loop()
             {
-                teensyAgent->debug_log.Printf("Starting Teensy Loop\n");
+                channelAgent->debug_log.Printf("Starting Teensy Loop\n");
 
                 // ElapsedTime et;
-                while (teensyAgent->running())
+                while (channelAgent->running())
                 {
                     struct sysinfo meminfoin;
                     sysinfo(&meminfoin);
@@ -107,35 +107,35 @@ namespace Artemis
                     {
                         if(iretn < 0)
                         {
-                            teensyAgent->debug_log.Printf("Error in getting incoming SLIP packet. iretn=%d\n", iretn);
+                            channelAgent->debug_log.Printf("Error in getting incoming SLIP packet. iretn=%d\n", iretn);
                         }
                         return;
                     }
 
                     if((iretn = incomingPacket.RawUnPacketize()) < 0)
                     {
-                        teensyAgent->debug_log.Printf("Failed to un-packetize incoming UART serial packet. iretn=%d\n", iretn);
+                        channelAgent->debug_log.Printf("Failed to un-packetize incoming UART serial packet. iretn=%d\n", iretn);
                         return;
                     }
                     
-                    teensyAgent->debug_log.Printf("incomingPacket.header.type=%d\n", incomingPacket.header.type);
+                    channelAgent->debug_log.Printf("incomingPacket.header.type=%d\n", incomingPacket.header.type);
                     
                     switch (incomingPacket.header.type)
                     {
                         case PacketComm::TypeId::CommandCameraCapture:
                         case PacketComm::TypeId::CommandObcHalt:
-                            iretn = teensyAgent->channel_push("PAYLOAD", incomingPacket);
+                            iretn = channelAgent->channel_push("PAYLOAD", incomingPacket);
                             if(iretn < 0)
                             {
-                                teensyAgent->debug_log.Printf("Failed to forward incoming packet to payload channel. iretn=%d\n", iretn);
+                                channelAgent->debug_log.Printf("Failed to forward incoming packet to payload channel. iretn=%d\n", iretn);
                                 return;
                             }
                             break;
                         default:
-                            iretn = teensyAgent->channel_push(0, incomingPacket);
+                            iretn = channelAgent->channel_push(0, incomingPacket);
                             if(iretn < 0)
                             {
-                                teensyAgent->debug_log.Printf("Failed to forward incoming packet to main channel. iretn=%d\n", iretn);
+                                channelAgent->debug_log.Printf("Failed to forward incoming packet to main channel. iretn=%d\n", iretn);
                                 return;
                             }
                             break;
@@ -153,11 +153,11 @@ namespace Artemis
              */
             void TeensyChannel::sendToTeensySerial()
             {
-                int32_t iretn = teensyAgent->channel_pull(teensyChannelNumber, outgoingPacket);
+                int32_t iretn = channelAgent->channel_pull(channelNumber, outgoingPacket);
                 
                 if (iretn < 0)
                 {
-                    teensyAgent->debug_log.Printf("Error in checking Teensy channel for outgoing packet. iretn=%d\n", iretn);
+                    channelAgent->debug_log.Printf("Error in checking Teensy channel for outgoing packet. iretn=%d\n", iretn);
                     return;
                 }
 
@@ -180,11 +180,11 @@ namespace Artemis
                 {
                     if (iretn < 0)
                     {
-                        teensyAgent->debug_log.Printf("Failed to receive incoming I2C packet. iretn=%d\n", iretn);
+                        channelAgent->debug_log.Printf("Failed to receive incoming I2C packet. iretn=%d\n", iretn);
                     }
                     else if (msg.length() < sizeof(PacketComm::header) + sizeof(PacketComm::crc))
                     {
-                        teensyAgent->debug_log.Printf("Received incomplete incoming I2C packet. msg.length()=%d\n", msg.length());
+                        channelAgent->debug_log.Printf("Received incomplete incoming I2C packet. msg.length()=%d\n", msg.length());
                     }
                     return;
                 }
@@ -198,13 +198,13 @@ namespace Artemis
 
                 if ((iretn = incomingPacket.Unwrap()) < 0)
                 {
-                    teensyAgent->debug_log.Printf("Failed to unwrap incoming I2C packet. iretn=%d\n", iretn);
+                    channelAgent->debug_log.Printf("Failed to unwrap incoming I2C packet. iretn=%d\n", iretn);
                     return;
                 }
 
-                if((iretn = teensyAgent->channel_push(0, incomingPacket)) < 0)
+                if((iretn = channelAgent->channel_push(0, incomingPacket)) < 0)
                 {
-                    teensyAgent->debug_log.Printf("Failed to forward incoming packet to main channel. iretn=%d\n", iretn);
+                    channelAgent->debug_log.Printf("Failed to forward incoming packet to main channel. iretn=%d\n", iretn);
                     return;
                 }
 

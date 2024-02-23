@@ -57,12 +57,12 @@ namespace Artemis
             class TeensyChannel
             {
             public:
-                int32_t teensyChannelNumber;
-                uint16_t teensyChannelDataSize = 0;
-                float teensyChannelDataSpeed = 0.;
+                int32_t channelNumber;
+                uint16_t channelDataSize = 0;
+                float channelDataSpeed = 0.;
                 /** @todo This appears to not be used. */
                 bool running;
-                Agent *teensyAgent;
+                Agent *channelAgent;
                 /** @todo This appears to not be used. */
                 unordered_map<string, uint16_t> tsen_didx;
 
@@ -92,12 +92,12 @@ namespace Artemis
             class PayloadChannel
             {
             public:
-                int32_t payloadChannelNumber;
-                uint16_t payloadChannelDataSize = 0;
-                float payloadChannelDataSpeed = 0.;
+                int32_t channelNumber;
+                uint16_t channelDataSize = 0;
+                float channelDataSpeed = 0.;
                 /** @todo This appears to not be used. */
                 bool running;
-                Agent *payloadAgent;
+                Agent *channelAgent;
 
                 PayloadChannel();
                 int32_t Init(Agent *agent);
