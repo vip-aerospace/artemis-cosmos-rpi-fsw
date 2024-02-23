@@ -119,9 +119,7 @@ namespace Artemis
                         channelAgent->debug_log.Printf("Failed to un-packetize incoming UART serial packet. iretn=%d\n", iretn);
                         return;
                     }
-                    
-                    channelAgent->debug_log.Printf("incomingPacket.header.type=%d\n", incomingPacket.header.type);
-                    
+                      
                     switch (incomingPacket.header.type)
                     {
                         case PacketComm::TypeId::CommandCameraCapture:

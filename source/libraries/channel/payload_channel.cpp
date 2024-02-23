@@ -81,13 +81,14 @@ namespace Artemis
             {
                 int32_t iretn = channelAgent->channel_pull(channelNumber, incomingPacket);
 
-                if (iretn < 0)
+                if (iretn <= 0)
                 {
-                    channelAgent->debug_log.Printf("Error in checking payload channel for incoming packet. iretn=%d\n", iretn);
+                    if(iretn < 0)
+                    {
+                        channelAgent->debug_log.Printf("Error in checking payload channel for incoming packet. iretn=%d\n", iretn);
+                    }
                     return;
                 }
-
-                printf("%u\n", incomingPacket.header.type);
 
                 switch (incomingPacket.header.type)
                 {
@@ -95,14 +96,14 @@ namespace Artemis
                     {
                         string response;
                         iretn = data_execute("python3 ~/artemis-cosmos-rpi-fsw/source/scripts/capture.py", response);
-                        printf("%s\n", response);
+                        channelAgent->debug_log.Printf("Tried to run CameraCapture command. iretn=%d response=%s\n", iretn, response.c_str());
                     }
                     break;
                     case PacketComm::TypeId::CommandObcHalt:
                     {
                         string response;
                         iretn = data_execute("sudo shutdown now", response);
-                        printf("%s\n", response);
+                        channelAgent->debug_log.Printf("Tried to run OBCHalt command. iretn=%d response=%s\n", iretn, response.c_str());
                     }
                     break;
                 }
