@@ -148,8 +148,6 @@ namespace Artemis
             /**
              * @brief Helper function to send a packet to the Teensy over UART
              * serial.
-             * 
-             * @todo Complete this function.
              */
             void TeensyChannel::sendToTeensySerial()
             {
@@ -160,19 +158,8 @@ namespace Artemis
                     channelAgent->debug_log.Printf("Error in checking Teensy channel for outgoing packet. iretn=%d\n", iretn);
                     return;
                 }
-
-                outgoingPacket.Wrap();
-
-                for (int i = 0; i < outgoingPacket.wrapped.size(); i++){
-                    printf("%x ", outgoingPacket.wrapped.data()[i]);
-                }
-                printf("\n");
-
-                iretn = slip_encode(outgoingPacket.packetized, outgoingPacket.packetized);
-
-                printf("slip_pack iretn=%d", iretn);
-                /*
-                if(!outgoingPacket.SLIPPacketize())
+                
+                if(!outgoingPacket.RawPacketize())
                 {
                     channelAgent->debug_log.Printf("Failed to SLIP packetize outgoing packet.");
                     return;
@@ -186,7 +173,7 @@ namespace Artemis
                     }
                     return;
                 }
-                */
+                
                 return;
             }
 
