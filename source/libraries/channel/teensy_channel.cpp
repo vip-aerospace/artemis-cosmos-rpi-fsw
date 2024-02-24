@@ -107,7 +107,7 @@ namespace Artemis
                     
                     if((iretn = serial->get_slip(incomingPacket.packetized)) <= 0)
                     {
-                        if(iretn < 0)
+                        if(iretn < 0 && iretn != SERIAL_ERROR_SLIPIN)
                         {
                             channelAgent->debug_log.Printf("Error in getting incoming SLIP packet. iretn=%d\n", iretn);
                         }
