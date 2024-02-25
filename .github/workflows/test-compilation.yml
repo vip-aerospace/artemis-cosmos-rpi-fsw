@@ -1,4 +1,4 @@
-name: Validate Data
+name: Test Compilation
 
 on:
   push:
@@ -31,7 +31,14 @@ jobs:
         run: |
           git clone https://github.com/hsfl/artemis-cosmos-rpi-fsw ~/cosmos/source/projects/artemis-cosmos-rpi-fsw
 
-      - name: Compile artemis-cosmos-rpi-fsw
+      - name: Compile artemis-cosmos-rpi-fsw for Linux
+        run: |
+          cd ~/cosmos/source/projects/artemis-cosmos-rpi-fsw/source/build
+          ./do_cmake_linux
+          cd linux
+          make install
+
+      - name: Cross-compile artemis-cosmos-rpi-fsw for Raspberry Pi
         run: |
           cd ~/cosmos/source/projects/artemis-cosmos-rpi-fsw/source/build
           ./do_cmake_rpi
