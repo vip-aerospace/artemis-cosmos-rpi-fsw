@@ -1,37 +1,36 @@
-name: C/C++ CI
+name: Validate Data
 
 on:
   push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - name: Setup compilation tools
-      run: cd ~
-      run: sudo apt update
-      run: sudo apt upgrade
-      run: sudo apt-get install build-essential cmake 
-      run: wget https://github.com/Pro/raspi-toolchain/releases/latest/download/raspi-toolchain.tar.gz
-      run: tar xfz raspi-toolchain.tar.gz --strip-components=1 -C /opt
-    - name: Clone COSMOS
-      run: git clone https://github.com/hsfl/cosmos.git ~/cosmos
-      run: cd ~/cosmos/install_scripts
-      run: chmod +x *
-      run: ./cosmos-install
-      run: cd ~/cosmos
-      run: git submodule update --init --recursive
-      run: git submodule update --remote --merge
-    - name: Clone artemis-cosmos-rpi-fsw
-      run: cd ~/cosmos/source/projects/
-    - uses: actions/checkout@v3
-    - name: Compile artemis-cosmos-rpi-fsw
-      run: cd ~/cosmos/source/projects/artemis-cosmos-rpi-fsw/source/build
-      run: ./do_cmake_rpi
-      run: cd rpi_
-      run: make install
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: script/validate-data/package-lock.json
+
+      - name: Setup compilation tools
+        run: |
+          sudo apt update
+          sudo apt upgrade
+          sudo apt-get install build-essential cmake 
+          wget https://github.com/Pro/raspi-toolchain/releases/latest/download/raspi-toolchain.tar.gz
+          tar xfz raspi-toolchain.tar.gz --strip-components=1 -C /opt
+        working-directory: ~
+
+      - name: Clone COSMOS
+        run: |
+          git clone https://github.com/hsfl/cosmos.git ~/cosmos
+          run: cd ~/cosmos/install_scripts
+          run: chmod +x *
+          run: ./cosmos-install
+          run: cd ~/cosmos
+          run: git submodule update --init --recursive
+          run: git submodule update --remote --merge
