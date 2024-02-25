@@ -25,16 +25,22 @@ namespace Artemis
              * @param agent Agent: The agent that will contain this channel.
              * @return int32_t 0 on successful initialization, negative value if
              * unsuccessful.
-             * 
-             * @todo Validate that the argument is valid.
              */
             int32_t TeensyChannel::Init(Agent *agent)
             {
+                int32_t iretn;
+
+                if (agent == NULL) {
+                    iretn = COSMOS_GENERAL_ERROR_NULLPOINTER;
+                    printf("Unable to initialize TeensyChannel under invalid Agent. iretn=%d\n", iretn);
+                    return iretn;
+                }
+
                 this->channelAgent = agent;
 
                 serial = new Serial("/dev/ttyS0", 9600);
 
-                int32_t iretn = serial->get_error();
+                iretn = serial->get_error();
                 if (iretn < 0)
                 {
                     channelAgent->debug_log.Printf("Error setting up Teensy UART serial connection. iretn=%d\n", iretn);
