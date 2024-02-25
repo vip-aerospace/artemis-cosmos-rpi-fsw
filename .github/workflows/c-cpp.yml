@@ -20,9 +20,20 @@ jobs:
       - name: Clone COSMOS
         run: |
           git clone https://github.com/hsfl/cosmos.git ~/cosmos
-          run: cd ~/cosmos/install_scripts
-          run: chmod +x *
-          run: ./cosmos-install
-          run: cd ~/cosmos
-          run: git submodule update --init --recursive
-          run: git submodule update --remote --merge
+          cd ~/cosmos/install_scripts
+          chmod +x *
+          ./cosmos-install
+          cd ~/cosmos
+          git submodule update --init --recursive
+          git submodule update --remote --merge
+          cd ~/cosmos/source/projects/
+
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Compile artemis-cosmos-rpi-fsw
+        run: |
+          cd ~/cosmos/source/projects/artemis-cosmos-rpi-fsw/source/build
+          ./do_cmake_rpi
+          cd rpi_
+          make install
