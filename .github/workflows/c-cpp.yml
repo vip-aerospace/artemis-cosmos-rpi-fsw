@@ -28,7 +28,7 @@ jobs:
           git submodule update --remote --merge
 
       - name: Check out repository code
-        run:
+        run: |
           git clone https://github.com/hsfl/artemis-cosmos-rpi-fsw ~/cosmos/source/projects/
 
       - name: Compile artemis-cosmos-rpi-fsw
