@@ -76,11 +76,7 @@ namespace Artemis
                 return;
             }
 
-            /**
-             * @brief Helper function to control the satellite's payload.
-             * 
-             * @todo Use proper debug logging and log relevant feedback.
-             */
+            /** @brief Helper function to control the satellite's payload. */
             void PayloadChannel::controlPayload()
             {
                 int32_t iretn = channelAgent->channel_pull(channelNumber, incomingPacket);
