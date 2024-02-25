@@ -27,12 +27,16 @@ namespace Artemis
              * @param agent Agent: The agent that will contain this channel.
              * @return int32_t 0 on successful initialization, negative value if
              * unsuccessful.
-             * 
-             * @todo Validate that the argument is valid.
              */
             int32_t PayloadChannel::Init(Agent *agent)
             {
                 int32_t iretn;
+
+                if (agent == NULL) {
+                    iretn = COSMOS_GENERAL_ERROR_NULLPOINTER;
+                    printf("Unable to initialize PayloadChannel under invalid Agent. iretn=%d\n", iretn);
+                    return iretn;
+                }
 
                 this->channelAgent = agent;
 
