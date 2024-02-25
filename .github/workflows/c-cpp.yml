@@ -26,12 +26,10 @@ jobs:
           cd ~/cosmos
           git submodule update --init --recursive
           git submodule update --remote --merge
-          cd ~/cosmos/source/projects/
 
       - name: Check out repository code
-        uses: actions/checkout@v3
-        with: 
-          path: 'cosmos/source/projects/'
+        run:
+          git clone https://github.com/hsfl/artemis-cosmos-rpi-fsw ~/cosmos/source/projects/
 
       - name: Compile artemis-cosmos-rpi-fsw
         run: |
