@@ -19,7 +19,7 @@ using namespace Artemis::RaspberryPi::Channels;
 
 /**
  * @brief Type definition for pointer to a function.
- * 
+ **
  * This typedef defines a type for a pointer to a function accepting a single
  * boolean argument. It is used to pass a function as a parameter to another
  * function.
