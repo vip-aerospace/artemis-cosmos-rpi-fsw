@@ -83,8 +83,21 @@ namespace
  * 
  * @todo Break up into helper functions.
  */
+
+void Setup();
+void Loop();
+void Shutdown();
+
 int main(int argc, char *argv[])
 {
+    Setup();
+    Loop();
+    Shutdown();
+
+    return 0;
+}
+
+void Setup() {
     int32_t iretn = 0;
 
     /////////////////////////////////////////////////////
@@ -124,7 +137,9 @@ int main(int argc, char *argv[])
     // Define agent requests
     agent->cinfo->agent0.aprd = 1.;
     agent->start_active_loop();
+}
 
+void Loop() {
     ////////////////////////////////////////////////////
     // Main Loop
     ////////////////////////////////////////////////////
@@ -196,8 +211,10 @@ int main(int argc, char *argv[])
         // }
 
         std::this_thread::yield();
-    }
+        }
+}
 
+void Shutdown() {
     ////////////////////////////////////////////////
     // Shutdown
     ///////////////////////////////////////////////
@@ -205,8 +222,6 @@ int main(int argc, char *argv[])
     // Wait for all other running threads to finish.
     teensy_thread.join();
     file_thread.join();
-
-    return 0;
 }
 
 /////////////////////////
