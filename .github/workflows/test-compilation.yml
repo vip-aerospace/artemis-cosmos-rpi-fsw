@@ -30,7 +30,7 @@ jobs:
           git clone https://github.com/${{ github.repository }}.git ~/cosmos/source/projects/${{ github.event.repository.name }}
           cd ~/cosmos/source/projects/${{ github.event.repository.name }}
           git fetch
-          git checkout ${{ github.ref }}
+          git checkout ${{ github.ref_name }}
 
       - name: Compile artemis-cosmos-rpi-fsw for Linux
         run: |
