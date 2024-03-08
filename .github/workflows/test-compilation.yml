@@ -1,9 +1,7 @@
 name: Test Compilation
-
 on:
   push:
   pull_request:
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,7 +14,7 @@ jobs:
           cd ~/
           wget https://github.com/Pro/raspi-toolchain/releases/latest/download/raspi-toolchain.tar.gz
           tar xfz raspi-toolchain.tar.gz --strip-components=1 -C /opt
-
+          
       - name: Clone COSMOS
         run: |
           git clone https://github.com/hsfl/cosmos.git ~/cosmos
@@ -26,21 +24,24 @@ jobs:
           cd ~/cosmos
           git submodule update --init --recursive
           git submodule update --remote --merge
-
+          
       - name: Check out repository code
         run: |
-          git clone https://github.com/hsfl/artemis-cosmos-rpi-fsw ~/cosmos/source/projects/artemis-cosmos-rpi-fsw
+          git clone https://github.com/${{ github.repository }}.git ~/cosmos/source/projects/${{ github.event.repository.name }}
+          cd ~/cosmos/source/projects/${{ github.event.repository.name }}
+          git fetch
+          git checkout ${{ github.ref }}
 
       - name: Compile artemis-cosmos-rpi-fsw for Linux
         run: |
-          cd ~/cosmos/source/projects/artemis-cosmos-rpi-fsw/source/build
+          cd ~/cosmos/source/projects/${{ github.event.repository.name }}/source/build
           ./do_cmake_linux
           cd linux
           make install
-
+          
       - name: Cross-compile artemis-cosmos-rpi-fsw for Raspberry Pi
         run: |
-          cd ~/cosmos/source/projects/artemis-cosmos-rpi-fsw/source/build
+          cd ~/cosmos/source/projects/${{ github.event.repository.name }}/source/build
           ./do_cmake_rpi
           cd rpi_
           make install
