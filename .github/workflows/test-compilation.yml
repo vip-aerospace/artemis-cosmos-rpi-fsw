@@ -17,9 +17,14 @@ jobs:
           wget https://github.com/Pro/raspi-toolchain/releases/latest/download/raspi-toolchain.tar.gz
           tar xfz raspi-toolchain.tar.gz --strip-components=1 -C /opt
 
-      - name: Clone COSMOS
+      - name: Checkout COSMOS
+        uses: actions/checkout@v4
+        with:
+          repository: hsfl/cosmos
+          path: ~/cosmos
+
+      - name: Setup COSMOS
         run: |
-          git clone https://github.com/hsfl/cosmos.git ~/cosmos
           cd ~/cosmos/install_scripts
           chmod +x *
           ./cosmos-install.sh
@@ -27,9 +32,11 @@ jobs:
           git submodule update --init --recursive
           git submodule update --remote --merge
 
-      - name: Check out repository code
-        run: |
-          git clone https://github.com/hsfl/artemis-cosmos-rpi-fsw ~/cosmos/source/projects/artemis-cosmos-rpi-fsw
+      - name: Checkout artemis-cosmos-rpi-fsw
+        uses: actions/checkout@v4
+        with:
+          repository: hsfl/artemis-cosmos-rpi-fsw
+          path: ~/cosmos/source/projects/artemis-cosmos-rpi-fsw
 
       - name: Compile artemis-cosmos-rpi-fsw for Linux
         run: |
