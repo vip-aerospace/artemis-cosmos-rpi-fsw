@@ -27,7 +27,7 @@ jobs:
           
       - name: Check out repository code
         run: |
-          git clone https://github.com/${{ github.repository }}.git ~/cosmos/source/projects/${{ github.repository }}
+          git clone ${{ github.repositoryUrl }} ~/cosmos/source/projects/${{ github.event.repository.name }}
           cd ~/cosmos/source/projects/${{ github.repository }}
           git fetch
           git checkout ${{ github.ref }}
