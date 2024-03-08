@@ -35,7 +35,6 @@ jobs:
       - name: Checkout artemis-cosmos-rpi-fsw
         uses: actions/checkout@v4
         with:
-          repository: hsfl/artemis-cosmos-rpi-fsw
           path: ~/cosmos/source/projects/artemis-cosmos-rpi-fsw
 
       - name: Compile artemis-cosmos-rpi-fsw for Linux
