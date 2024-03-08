@@ -28,20 +28,20 @@ jobs:
       - name: Check out repository code
         run: |
           git clone ${{ github.repositoryUrl }} ~/cosmos/source/projects/${{ github.event.repository.name }}
-          cd ~/cosmos/source/projects/${{ github.repository }}
+          cd ~/cosmos/source/projects/${{ github.event.repository.name }}
           git fetch
           git checkout ${{ github.ref }}
 
       - name: Compile artemis-cosmos-rpi-fsw for Linux
         run: |
-          cd ~/cosmos/source/projects/artemis-cosmos-rpi-fsw/source/build
+          cd ~/cosmos/source/projects/${{ github.event.repository.name }}/source/build
           ./do_cmake_linux
           cd linux
           make install
           
       - name: Cross-compile artemis-cosmos-rpi-fsw for Raspberry Pi
         run: |
-          cd ~/cosmos/source/projects/artemis-cosmos-rpi-fsw/source/build
+          cd ~/cosmos/source/projects/${{ github.event.repository.name }}/source/build
           ./do_cmake_rpi
           cd rpi_
           make install
