@@ -13,7 +13,7 @@ jobs:
           sudo apt update
           sudo apt upgrade
           sudo apt-get install build-essential cmake 
-          cd ~/
+          cd {$GITHUB_WORKSPACE}/
           wget https://github.com/Pro/raspi-toolchain/releases/latest/download/raspi-toolchain.tar.gz
           tar xfz raspi-toolchain.tar.gz --strip-components=1 -C /opt
 
@@ -21,32 +21,32 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: hsfl/cosmos
-          path: ../../../cosmos
+          path: cosmos
 
       - name: Setup COSMOS
         run: |
-          cd ~/cosmos/install_scripts
+          cd {$GITHUB_WORKSPACE}/cosmos/install_scripts
           chmod +x *
           ./cosmos-install.sh
-          cd ~/cosmos
+          cd {$GITHUB_WORKSPACE}/cosmos
           git submodule update --init --recursive
           git submodule update --remote --merge
 
       - name: Checkout artemis-cosmos-rpi-fsw
         uses: actions/checkout@v4
         with:
-          path: ../../../cosmos/source/projects/artemis-cosmos-rpi-fsw
+          path: cosmos/source/projects/artemis-cosmos-rpi-fsw
 
       - name: Compile artemis-cosmos-rpi-fsw for Linux
         run: |
-          cd ~/cosmos/source/projects/artemis-cosmos-rpi-fsw/source/build
+          cd {$GITHUB_WORKSPACE}/cosmos/source/projects/artemis-cosmos-rpi-fsw/source/build
           ./do_cmake_linux
           cd linux
           make install
 
       - name: Cross-compile artemis-cosmos-rpi-fsw for Raspberry Pi
         run: |
-          cd ~/cosmos/source/projects/artemis-cosmos-rpi-fsw/source/build
+          cd {$GITHUB_WORKSPACE}/cosmos/source/projects/artemis-cosmos-rpi-fsw/source/build
           ./do_cmake_rpi
           cd rpi_
           make install
