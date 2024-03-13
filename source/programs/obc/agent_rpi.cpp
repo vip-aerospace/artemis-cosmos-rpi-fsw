@@ -463,7 +463,7 @@ void fire_event(const vector<bool> flags, bool &event_switch, void (*eventHandle
  * @param response string: The response from the packet handler.
  * @param agent Agent: The packet handler agent, which does the forwarding.
  * @return int32_t Size of packet in bytes if successfully forwarded, negative 
- * error value if unsuccessful.
+ * error value if unsuccessful .
  */
 int32_t forward_to_payload_channel(PacketComm &packet, string &response, Agent *agent)
 {
