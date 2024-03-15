@@ -25,13 +25,18 @@ using namespace Artemis::RaspberryPi::Channels;
  * function.
  */
 typedef void (*on_event_switch)(bool active);
-
+void Setup();
+void Loop();
+void Shutdown();
 void fire_event(const vector<bool> flags, bool &event_switch, on_event_switch);
 void update_radio_availability_for_file_transfer(bool active);
 int32_t forward_to_payload_channel(PacketComm &packet, string &response, Agent *agent);
 
 int32_t init_agent_rpi();
 static int32_t get_last_offset();
+
+int32_t iretn = 0;
+PacketHandler packethandler;
 
 // For external linkage
 bool start_teensy = true;
@@ -84,21 +89,19 @@ namespace
  * @todo Break up into helper functions.
  */
 
-void Setup();
-void Loop();
-void Shutdown();
+
 
 int main(int argc, char *argv[])
 {
-    Setup();
-    Loop();
+    Setup(iretn, packethandler);
+    Loop(iretn, packethandler);
     Shutdown();
 
     return 0;
 }
 
-void Setup() {
-    int32_t iretn = 0;
+void Setup(int32_t&iretn, PacketHandler &packethandler) {
+    //int32_t iretn = 0;
 
     /////////////////////////////////////////////////////
     // Setup
@@ -130,7 +133,7 @@ void Setup() {
     iretn = init_agent_rpi();
 
     // Initialize packet handler
-    PacketHandler packethandler;
+    //PacketHandler packethandler;
     packethandler.init(agent);
     packethandler.add_func((PacketComm::TypeId)200, forward_to_payload_channel);
 
@@ -139,7 +142,7 @@ void Setup() {
     agent->start_active_loop();
 }
 
-void Loop() {
+void Loop(int32_t &iretn, PacketHandler &packethandler) {
     ////////////////////////////////////////////////////
     // Main Loop
     ////////////////////////////////////////////////////
