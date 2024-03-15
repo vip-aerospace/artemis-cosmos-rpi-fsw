@@ -99,7 +99,6 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-
 void Setup(int32_t&iretn, PacketHandler &packethandler) {
     //int32_t iretn = 0;
 
@@ -109,7 +108,7 @@ void Setup(int32_t&iretn, PacketHandler &packethandler) {
     // Argument validation
     // Optional arg
     // agent_rpi [debug_level]
-    if (argc > 1 && (argv[1][0] >= '0' && argv[1][0] <= '4'))
+   /* if (argc > 1 && (argv[1][0] >= '0' && argv[1][0] <= '4'))
     {
         // debug_level = static_cast<Error::LogType>(argv[1][0] - '0');
     }
@@ -123,7 +122,7 @@ void Setup(int32_t&iretn, PacketHandler &packethandler) {
         {
             start_file = false;
         }
-    }
+    }*/
 
     // Agent initialization
     /**
